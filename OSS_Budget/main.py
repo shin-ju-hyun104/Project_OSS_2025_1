@@ -10,7 +10,7 @@ def main():
         print("2. 지출 목록 보기")
         print("3. 총 지출 보기")
         print("4. 종료")
-        print("7. 소비 MBTI 분석")
+        print("5. 소비 MBTI 분석")
         choice = input("선택 > ")
 
         if choice == "1":
