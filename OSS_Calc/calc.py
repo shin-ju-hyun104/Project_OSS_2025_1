@@ -19,7 +19,7 @@ class Calculator:
             ['4', '5', '6', '*'],
             ['1', '2', '3', '-'],
             ['0', '.', 'C', '+'],
-            ['=']
+            ['=', '퀴즈시작', '정답확인']
         ]
 
         for row in buttons:
@@ -48,5 +48,27 @@ class Calculator:
         self.entry.delete(0, tk.END)
         self.entry.insert(tk.END, self.expression)
 
+    def start_quiz(self):
+        a, b = random.randint(1, 20), random.randint(1, 20)
+        self.current_answer = a + b
+        self.quiz_mode = True
+        self.expression = ""
+        self.entry.delete(0, tk.END)
+        self.entry.insert(0, f"{a} + {b} = ?")
+
+    def check_quiz_answer(self):
+        if self.quiz_mode:
+            user_input = self.entry.get()
+            try:
+                if int(user_input) == self.current_answer:
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, "정답!")
+                else:
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, "틀렸어요")
+            except ValueError:
+                self.entry.delete(0, tk.END)
+                self.entry.insert(0, "숫자를 입력하세요")
+            self.quiz_mode = False
 
 
