@@ -36,5 +36,5 @@ def main():
             print("잘못된 선택입니다.\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     main()
