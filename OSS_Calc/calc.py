@@ -1,26 +1,25 @@
 import tkinter as tk
-
+import threading
 import random
 
 class Calculator:
     def __init__(self, root):
         self.root = root
-        self.root.title("계산기")
-        self.root.geometry("300x420")
-
+        self.root.title("타이머 계산기")
+        self.root.geometry("300x400")
         self.expression = ""
-        self.quiz_mode = False
-        self.current_answer = None
+        self.timer = None  # 타이머 객체 저장용
 
         self.entry = tk.Entry(root, font=("Arial", 24), justify="right")
         self.entry.pack(fill="both", ipadx=8, ipady=15, padx=10, pady=10)
 
+        # 버튼 배열
         buttons = [
             ['7', '8', '9', '/'],
             ['4', '5', '6', '*'],
             ['1', '2', '3', '-'],
             ['0', '.', 'C', '+'],
-            ['=', '퀴즈시작', '정답확인']
+            ['=']
         ]
 
         for row in buttons:
@@ -35,47 +34,35 @@ class Calculator:
                 )
                 btn.pack(side="left", expand=True, fill="both")
 
+    def start_timer(self):
+        if self.timer:  # 기존 타이머 제거
+            self.timer.cancel()
+        self.timer = threading.Timer(5.0, self.time_out)  # 5초 타이머 시작
+        self.timer.start()
+
+    def time_out(self):
+        self.expression = "시간 초과"
+        self.update_entry()
+        self.expression = ""
+
+    def update_entry(self):
+        self.entry.delete(0, tk.END)
+        self.entry.insert(tk.END, self.expression)
+
     def on_click(self, char):
         if char == 'C':
+            if self.timer:
+                self.timer.cancel()
             self.expression = ""
-            self.entry.delete(0, tk.END)
         elif char == '=':
-            if not self.quiz_mode:
-                try:
-                    self.expression = str(eval(self.expression))
-                except Exception:
-                    self.expression = "에러"
-                self.entry.delete(0, tk.END)
-                self.entry.insert(tk.END, self.expression)
-        elif char == '퀴즈시작':
-            self.start_quiz()
-        elif char == '정답확인':
-            self.check_quiz_answer()
-        else:
-            if not self.quiz_mode:
-                self.expression += str(char)
-                self.entry.delete(0, tk.END)
-                self.entry.insert(tk.END, self.expression)
-
-    def start_quiz(self):
-        a, b = random.randint(1, 20), random.randint(1, 20)
-        self.current_answer = a + b
-        self.quiz_mode = True
-        self.expression = ""
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, f"{a} + {b} = ?")
-
-    def check_quiz_answer(self):
-        if self.quiz_mode:
-            user_input = self.entry.get()
+            if self.timer:
+                self.timer.cancel()
             try:
-                if int(user_input) == self.current_answer:
-                    self.entry.delete(0, tk.END)
-                    self.entry.insert(0, "정답!")
-                else:
-                    self.entry.delete(0, tk.END)
-                    self.entry.insert(0, "틀렸어요")
-            except ValueError:
-                self.entry.delete(0, tk.END)
-                self.entry.insert(0, "숫자를 입력하세요")
-            self.quiz_mode = False
+                self.expression = str(eval(self.expression))
+            except Exception:
+                self.expression = "에러"
+        else:
+            self.expression += str(char)
+            self.start_timer()  # 타이머 시작 또는 리셋
+
+        self.update_entry()
