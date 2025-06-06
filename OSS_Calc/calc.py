@@ -1,19 +1,20 @@
 import tkinter as tk
 
+import random
 
 class Calculator:
     def __init__(self, root):
         self.root = root
         self.root.title("계산기")
-        self.root.geometry("300x400")
+        self.root.geometry("300x420")
 
         self.expression = ""
+        self.quiz_mode = False
+        self.current_answer = None
 
-        # 입력창
         self.entry = tk.Entry(root, font=("Arial", 24), justify="right")
         self.entry.pack(fill="both", ipadx=8, ipady=15, padx=10, pady=10)
 
-        # 버튼 생성
         buttons = [
             ['7', '8', '9', '/'],
             ['4', '5', '6', '*'],
@@ -37,16 +38,24 @@ class Calculator:
     def on_click(self, char):
         if char == 'C':
             self.expression = ""
+            self.entry.delete(0, tk.END)
         elif char == '=':
-            try:
-                self.expression = str(eval(self.expression))
-            except Exception:
-                self.expression = "에러"
+            if not self.quiz_mode:
+                try:
+                    self.expression = str(eval(self.expression))
+                except Exception:
+                    self.expression = "에러"
+                self.entry.delete(0, tk.END)
+                self.entry.insert(tk.END, self.expression)
+        elif char == '퀴즈시작':
+            self.start_quiz()
+        elif char == '정답확인':
+            self.check_quiz_answer()
         else:
-            self.expression += str(char)
-
-        self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, self.expression)
+            if not self.quiz_mode:
+                self.expression += str(char)
+                self.entry.delete(0, tk.END)
+                self.entry.insert(tk.END, self.expression)
 
     def start_quiz(self):
         a, b = random.randint(1, 20), random.randint(1, 20)
@@ -70,5 +79,3 @@ class Calculator:
                 self.entry.delete(0, tk.END)
                 self.entry.insert(0, "숫자를 입력하세요")
             self.quiz_mode = False
-
-
